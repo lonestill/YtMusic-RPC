@@ -38,7 +38,7 @@
 
 Расширение отправляет данные трека из YouTube Music в приложение через WebSocket.
 
-→ [YouTube Music WebSocket Tracker на Greasy Fork](https://greasyfork.org/ru/scripts/515130-youtube-music-websocket-tracker)
+→ [YouTube Music WebSocket Tracker на Greasy Fork](https://greasyfork.org/ru/scripts/578650-youtube-music-websocket-tracker)
 
 Нужен менеджер пользовательских скриптов: [Tampermonkey](https://www.tampermonkey.net/) (Chrome/Firefox/Edge).
 
