@@ -1,43 +1,79 @@
-# YouTube Music Discord RPC
+<div align="center">
 
-This project displays the current track from YouTube Music as a Discord Rich Presence, allowing you to share the song title, artist, and album art with friends on Discord in real-time. It uses a WebSocket connection to receive track data and integrates it into Discord via Discord RPC.
+# YtMusic-RPC
 
-## Features
+**YouTube Music → Discord Rich Presence**
 
-- **Real-time Discord Rich Presence**: Updates your Discord status with the currently playing track from YouTube Music.
-- **Lightweight and Efficient**: Uses a WebSocket connection for seamless data transfer.
+[![Release](https://img.shields.io/github/v/release/M3th4d0n/YtMusic-RPC?style=flat-square&color=fc3c44)](https://github.com/M3th4d0n/YtMusic-RPC/releases/latest)
+[![Build](https://img.shields.io/github/actions/workflow/status/M3th4d0n/YtMusic-RPC/release.yml?style=flat-square)](https://github.com/M3th4d0n/YtMusic-RPC/actions)
+[![License](https://img.shields.io/github/license/M3th4d0n/YtMusic-RPC?style=flat-square)](LICENSE)
 
-## Installation
+Показывает текущий трек из YouTube Music в статусе Discord — с обложкой, прогресс-баром и прямой ссылкой на трек.
 
-To set up this project, you need to install the following component:
+</div>
 
-### YouTube Music Extension
+---
 
-First, install the **YouTube Music WebSocket Tracker** extension from [Greasy Fork](https://greasyfork.org/ru/scripts/515130-youtube-music-websocket-tracker).  
-This extension sends track information from YouTube Music to a local WebSocket server, which then relays it to Discord.
+## Возможности
 
-- **Direct Download**: [YouTube Music WebSocket Tracker](https://greasyfork.org/ru/scripts/515130-youtube-music-websocket-tracker)
+- **Discord Rich Presence** — обложка, название, артист, таймер
+- **GUI приложение** — нативное окно, сворачивается в трей
+- **История треков** — все прослушанные треки с обложками
+- **Статистика** — топ артисты и треки
+- **Кастомные кнопки** — настрой текст и ссылки кнопок в RPC
+- **Приватный режим** — скрыть название трека или артиста
+- **Blacklist** — треки и артисты которые не будут показываться
+- **Telegram уведомления** — отправка текущего трека в бота
+- **Автозапуск** при старте Windows
+- **Автообновление** — скачивает новые версии само
 
-## Usage
+## Установка
 
-1. Start playing music on [YouTube Music](https://music.youtube.com/).
-2. Ensure the YouTube Music WebSocket Tracker extension is active.
-3. Run the Discord RPC application you downloaded.
-4. Your Discord status should now update to display the current track information from YouTube Music.
+### 1. Скачать приложение
 
-## Updating
+→ [Последний релиз](https://github.com/M3th4d0n/YtMusic-RPC/releases/latest)
 
-Check for new releases of this application [here](https://github.com/M3th4d0n/YtMusic-RPC/releases/latest).
+Скачай `.exe` установщик и запусти.
 
-## Troubleshooting
+### 2. Установить расширение для браузера
 
-- **Track Information Not Updating**: Ensure both the WebSocket tracker extension and the Discord RPC application are running.
-- **Connection Issues**: Confirm that the WebSocket server is accessible on `ws://localhost:5000/trackInfo`. The extension and application require this connection to function.
+Расширение отправляет данные трека из YouTube Music в приложение через WebSocket.
 
-## Contributing
+→ [YouTube Music WebSocket Tracker на Greasy Fork](https://greasyfork.org/ru/scripts/515130-youtube-music-websocket-tracker)
 
-Feel free to submit pull requests or report [issues](https://github.com/M3th4d0n/YtMusic-RPC/issues/new) to improve functionality or suggest new features.
+Нужен менеджер пользовательских скриптов: [Tampermonkey](https://www.tampermonkey.net/) (Chrome/Firefox/Edge).
 
-## License
+## Использование
 
-This project is licensed under the MIT License.
+1. Запусти **YtMusic-RPC** — появится в трее
+2. Убедись что расширение активно (зелёный индикатор в приложении)
+3. Открой [YouTube Music](https://music.youtube.com/) и запусти трек
+4. Статус в Discord обновится автоматически
+
+## Разработка
+
+```bash
+git clone https://github.com/M3th4d0n/YtMusic-RPC
+cd YtMusic-RPC
+npm install
+npm run dev
+```
+
+**Стек:** Electron · React · TypeScript · discord-rpc · ws
+
+## Устранение неполадок
+
+| Проблема | Решение |
+|---|---|
+| Discord не обновляется | Убедись что Discord запущен и приложение к нему подключено (зелёный индикатор) |
+| Расширение не подключается | Проверь что WebSocket порт `5000` не заблокирован антивирусом |
+| Трек не отображается | Убедись что артист/трек не в blacklist |
+
+## Авторы
+
+- [m3th4d0n](https://github.com/M3th4d0n)
+- [Anfi1](https://github.com/Anfi1)
+
+## Лицензия
+
+[MIT](LICENSE)

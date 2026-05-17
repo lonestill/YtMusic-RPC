@@ -4,8 +4,8 @@ import { DiscordService } from './services/discord'
 import { WebSocketService, type TrackInfo } from './services/websocket'
 import { HistoryService } from './services/history'
 import { sendTelegramLog } from './services/telegram'
-import { getLatestVersion, isNewerVersion } from './services/github'
 import store from './store'
+import { setupAutoUpdater } from './services/updater'
 
 const VERSION = '1.2.0'
 
@@ -200,9 +200,8 @@ async function init() {
   discordConnected = await discord.connect()
   broadcast('status:update', { discord: discordConnected })
 
-  const latest = await getLatestVersion()
-  if (isNewerVersion(latest, VERSION)) {
-    broadcast('update:available', latest)
+  if (app.isPackaged) {
+    setupAutoUpdater(() => mainWindow)
   }
 
   app.on('activate', () => {
