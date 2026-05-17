@@ -1,105 +1,34 @@
-﻿# Rider specific
-.idea/
-.idea_modules/
-*.sln.iml
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/gradle.xml
-.idea/**/libraries
+# Dependencies
+node_modules/
 
-# Rider logs and temp files
-.idea/**/shelf/
-.idea/httpRequests/
-.idea/**/remoteSources
-.idea/repo/heads/
-.idea/vcs.xml
-.idea/assetWizard.xml
-.idea/modules.xml
-.idea/gradle.xml
-.idea/misc.xml
-.idea/modules/
-.idea/shelf/
-.idea/libraries/
-.idea/inspectionProfiles/
-.idea/.rider_test_results/
+# Build output
+out/
+dist/
 
-# Dotnet specific
-bin/
-obj/
-.vscode/
-.vscode-test/
-.vscode-test/**/*
-.vscode/testlogs/
-
-# Rider and Resharper specific caches
-.idea/.rider_test_results/
-.idea/workspace.xml
-.idea/workspace-vcs.xml
-.idea/tasks.xml
-.idea/codeStyles/
-.idea/.idea/
-.idea/codeStyles/
-.idea/**/uiDesigner.xml
-.idea/dataSources/
-
-# Windows specific
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msm
-*.msp
-*.lnk
-
-# macOS specific
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Common archives and backups
-*.7z
-*.dmg
-*.gz
-*.iso
-*.rar
-*.tar
-*.zip
-*.bak
-*.tmp
+# Electron
+.electron/
 
 # Logs
 *.log
-*.log.*
-log/
 logs/
 
-# Visual Studio temporary files
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE
+.idea/
 .vscode/
-.vscode-test/
-.vscode-test/**/*
-.vscode/testlogs/
-
-# User-specific Rider files
-*DotSettings.user
 *.sln.iml
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/gradle.xml
-.idea/**/libraries
-.idea/shelf/
 
+# Temp / backup
+*.tmp
+*.bak
+
+# Claude
+.claude/
+
+# App data (user config, not source)
 config.txt

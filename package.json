@@ -1,0 +1,60 @@
+{
+  "name": "ytmusic-rpc",
+  "version": "1.2.0",
+  "description": "YouTube Music Discord Rich Presence",
+  "main": "out/main/index.js",
+  "author": "m3th4d0n & Anfi1",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "package": "electron-vite build && electron-builder",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/renderer/tsconfig.json"
+  },
+  "dependencies": {
+    "discord-rpc": "^4.0.1",
+    "electron-store": "^8.1.0",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/discord-rpc": "^4.0.8",
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "@types/ws": "^8.5.10",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^42.1.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "vite": "~5.4.0"
+  },
+  "build": {
+    "appId": "com.m3th4d0n.ytmusic-rpc",
+    "productName": "YtMusic-RPC",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "out/**/*",
+      "resources/**/*"
+    ]
+  }
+}
