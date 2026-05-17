@@ -1,6 +1,10 @@
 {
   "name": "ytmusic-rpc",
+<<<<<<< HEAD
   "version": "2.0.0",
+=======
+  "version": "1.2.1",
+>>>>>>> 61778e5e2574bb086877b2c6abc0add60ed6008a
   "description": "YouTube Music Discord Rich Presence",
   "main": "out/main/index.js",
   "author": "lonestill & Anfi1",
@@ -35,7 +39,9 @@
   "build": {
     "appId": "com.lonestill.ytmusic-rpc",
     "productName": "YtMusic-RPC",
-    "directories": { "output": "dist" },
+    "directories": {
+      "output": "dist"
+    },
     "publish": {
       "provider": "github",
       "owner": "lonestill",
@@ -43,12 +49,22 @@
     },
     "win": {
       "icon": "resources/icon.ico",
-      "target": [{ "target": "nsis", "arch": ["x64"] }]
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
-    "files": ["out/**/*", "resources/**/*"]
+    "files": [
+      "out/**/*",
+      "resources/**/*"
+    ]
   }
 }
