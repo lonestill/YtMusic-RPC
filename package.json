@@ -1,6 +1,6 @@
 {
   "name": "ytmusic-rpc",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "YouTube Music Discord Rich Presence",
   "main": "out/main/index.js",
   "author": "m3th4d0n & Anfi1",
@@ -35,7 +35,9 @@
   "build": {
     "appId": "com.m3th4d0n.ytmusic-rpc",
     "productName": "YtMusic-RPC",
-    "directories": { "output": "dist" },
+    "directories": {
+      "output": "dist"
+    },
     "publish": {
       "provider": "github",
       "owner": "M3th4d0n",
@@ -43,12 +45,22 @@
     },
     "win": {
       "icon": "resources/icon.ico",
-      "target": [{ "target": "nsis", "arch": ["x64"] }]
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
-    "files": ["out/**/*", "resources/**/*"]
+    "files": [
+      "out/**/*",
+      "resources/**/*"
+    ]
   }
 }
