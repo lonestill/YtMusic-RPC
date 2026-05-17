@@ -29,11 +29,15 @@ export class WebSocketService extends EventEmitter {
       ws.on('message', (data) => {
         try {
           const info: TrackInfo = JSON.parse(data.toString())
+          console.log('[WS]', info.isPlaying ? 'playing' : 'paused', info.videoId, info.track)
           this.emit('trackUpdate', info)
         } catch {
           // ignore malformed messages
         }
       })
+
+      // ask extension for current state immediately on connect
+      ws.send(JSON.stringify({ type: 'getState' }))
 
       ws.on('close', () => {
         this._clientConnected = false

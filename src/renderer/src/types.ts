@@ -31,9 +31,6 @@ export interface Config {
   customButton1Url: string
   customButton2Label: string
   customButton2Url: string
-  privateMode: boolean
-  hideTrackName: boolean
-  hideArtistName: boolean
   toastNotifications: boolean
   blacklistArtists: string[]
   blacklistTracks: string[]
@@ -41,6 +38,7 @@ export interface Config {
   botToken: string
   chatId: string
   autostart: boolean
+  theme: 'dark' | 'light'
 }
 
 export interface AppStatus {

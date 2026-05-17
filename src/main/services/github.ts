@@ -1,4 +1,4 @@
-const API_URL = 'https://api.github.com/repos/M3th4d0n/YtMusic-RPC/releases/latest'
+const API_URL = 'https://api.github.com/repos/lonestill/YtMusic-RPC/releases/latest'
 
 export async function getLatestVersion(): Promise<string> {
   try {

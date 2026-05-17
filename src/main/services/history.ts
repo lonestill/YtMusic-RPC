@@ -50,6 +50,10 @@ export class HistoryService {
     }
   }
 
+  clear() {
+    fs.writeFileSync(this.filePath, '[]', 'utf-8')
+  }
+
   getRecent(limit = 200): HistoryEntry[] {
     try {
       const all: HistoryEntry[] = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))

@@ -7,7 +7,7 @@ import { sendTelegramLog } from './services/telegram'
 import store from './store'
 import { setupAutoUpdater } from './services/updater'
 
-const VERSION = '1.2.0'
+const VERSION = '2.0.0'
 
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
@@ -20,6 +20,8 @@ const history = new HistoryService()
 let currentTrack: TrackInfo | null = null
 let discordConnected = false
 let wsClientConnected = false
+let lastCurrentTime = -1
+let pauseDetectTimer: ReturnType<typeof setTimeout> | null = null
 
 function isBlacklisted(trackInfo: TrackInfo): boolean {
   const cfg = store.store
@@ -33,6 +35,18 @@ function isBlacklisted(trackInfo: TrackInfo): boolean {
 
 function showToast(track: string, artist: string, cover: string) {
   if (!store.get('toastNotifications')) return
+
+  // tray balloon on Windows (lighter, no sound)
+  if (process.platform === 'win32' && tray) {
+    tray.displayBalloon({
+      title: track,
+      content: artist,
+      iconType: 'none',
+      noSound: true
+    })
+    return
+  }
+
   if (!Notification.isSupported()) return
   new Notification({
     title: track,
@@ -114,14 +128,12 @@ function setupIPC() {
     if (updates['discordClientId']) {
       discord.reconnect()
     }
-    // re-apply presence immediately so privacy/button changes take effect
-    if (currentTrack) {
-      discord.updatePresence(currentTrack)
-    }
+    if (currentTrack) discord.updatePresence(currentTrack)
   })
 
   ipcMain.handle('history:get', () => history.getRecent(200))
   ipcMain.handle('history:stats', () => history.getStats())
+  ipcMain.handle('history:clear', () => history.clear())
 
   ipcMain.handle('blacklist:add-artist', (_, artist: string) => {
     const list = store.get('blacklistArtists')
@@ -145,6 +157,14 @@ function setupIPC() {
     version: VERSION
   }))
 
+  ipcMain.handle('discord:reconnect', async () => {
+    discordConnected = false
+    broadcast('status:update', { discord: false })
+    discordConnected = await discord.reconnect()
+    broadcast('status:update', { discord: discordConnected })
+    return discordConnected
+  })
+
   ipcMain.handle('window:minimize', () => mainWindow?.minimize())
   ipcMain.handle('window:hide', () => mainWindow?.hide())
   ipcMain.handle('shell:open', (_, url: string) => shell.openExternal(url))
@@ -156,8 +176,16 @@ function broadcast(channel: string, data: unknown) {
 
 function setupWebSocket() {
   wsService.on('trackUpdate', (trackInfo: TrackInfo) => {
-    const cleanArtist = trackInfo.artist.replace(/[\r\n]/g, '')
-    const clean: TrackInfo = { ...trackInfo, artist: cleanArtist }
+    // YTM subtitle contains "Artist • views • likes • year" — keep only the first segment
+    const rawArtist = trackInfo.artist.replace(/[\r\n]/g, '').trim()
+    const cleanArtist = rawArtist.split(/\s*•\s*/)[0].trim() || rawArtist
+
+    // upgrade cover resolution: replace =w{n}-h{n}... with w512-h512
+    const cover = trackInfo.cover
+      ? trackInfo.cover.replace(/=w\d+-h\d+[^"'\s]*/i, '=w512-h512-l90-rj')
+      : trackInfo.cover
+
+    const clean: TrackInfo = { ...trackInfo, artist: cleanArtist, cover }
 
     if (isBlacklisted(clean)) {
       discord.clear()
@@ -177,10 +205,37 @@ function setupWebSocket() {
       ).catch(() => {})
     }
 
-    discord.updatePresence(clean)
+    const newTime = Number(clean.currentTime)
+    const timeAdvanced = newTime !== lastCurrentTime
 
-    currentTrack = clean
-    broadcast('track:update', clean)
+    // if extension says playing but time hasn't moved, keep paused state
+    let effective = clean
+    if (clean.isPlaying && !timeAdvanced && currentTrack && !currentTrack.isPlaying) {
+      effective = { ...clean, isPlaying: false }
+    }
+
+    discord.updatePresence(effective)
+    currentTrack = effective
+    broadcast('track:update', effective)
+
+    if (effective.isPlaying) {
+      if (timeAdvanced) {
+        // time is advancing → reset pause timer
+        lastCurrentTime = newTime
+        if (pauseDetectTimer) clearTimeout(pauseDetectTimer)
+        pauseDetectTimer = setTimeout(() => {
+          if (currentTrack?.isPlaying) {
+            const paused: TrackInfo = { ...currentTrack, isPlaying: false }
+            currentTrack = paused
+            broadcast('track:update', paused)
+            discord.updatePresence(paused)
+          }
+        }, 3500)
+      }
+    } else {
+      if (pauseDetectTimer) { clearTimeout(pauseDetectTimer); pauseDetectTimer = null }
+      lastCurrentTime = newTime
+    }
   })
 
   wsService.on('clientConnected', () => {

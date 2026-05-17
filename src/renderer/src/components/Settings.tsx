@@ -5,13 +5,22 @@ import { IconCheck, IconExternalLink, IconX } from './Icons'
 const DEFAULT: Config = {
   discordClientId: '1194717480627740753',
   customButton1Label: 'Listen', customButton1Url: '',
-  customButton2Label: 'Download', customButton2Url: 'https://github.com/M3th4d0n/YtMusic-RPC',
-  privateMode: false, hideTrackName: false, hideArtistName: false,
+  customButton2Label: 'Download', customButton2Url: 'https://github.com/lonestill/YtMusic-RPC',
   toastNotifications: true,
   blacklistArtists: [], blacklistTracks: [],
   analyticsEnabled: false, botToken: '', chatId: '',
   autostart: false
 }
+
+type Section = 'system' | 'discord' | 'blacklist' | 'telegram' | 'about'
+
+const SECTIONS: { id: Section; label: string }[] = [
+  { id: 'system',    label: 'System' },
+  { id: 'discord',   label: 'Discord' },
+  { id: 'blacklist', label: 'Blacklist' },
+  { id: 'telegram',  label: 'Telegram' },
+  { id: 'about',     label: 'About' },
+]
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -22,34 +31,34 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   )
 }
 
-function BlacklistSection({
-  title, items, onAdd, onRemove, placeholder
-}: {
-  title: string
-  items: string[]
-  onAdd: (v: string) => void
-  onRemove: (v: string) => void
-  placeholder: string
+function Row({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="settings-row">
+      <div>
+        <div className="settings-label">{label}</div>
+        {hint && <div className="settings-hint">{hint}</div>}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function BlacklistSection({ title, items, onAdd, onRemove, placeholder }: {
+  title: string; items: string[]
+  onAdd: (v: string) => void; onRemove: (v: string) => void; placeholder: string
 }) {
   const [input, setInput] = useState('')
-
   function add() {
     const v = input.trim()
     if (v && !items.includes(v)) { onAdd(v); setInput('') }
   }
-
   return (
-    <div>
+    <div className="blacklist-section">
       <div className="blacklist-label">{title}</div>
       <div className="blacklist-input-row">
-        <input
-          className="settings-input"
-          style={{ flex: 1, width: 'auto' }}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && add()}
-          placeholder={placeholder}
-        />
+        <input className="settings-input" style={{ flex: 1, width: 'auto' }}
+          value={input} onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && add()} placeholder={placeholder} />
         <button className="btn-ghost" onClick={add}>Add</button>
       </div>
       {items.length > 0 && (
@@ -66,9 +75,10 @@ function BlacklistSection({
   )
 }
 
-export function Settings() {
+export function Settings({ onThemeChange }: { onThemeChange?: (t: 'dark' | 'light') => void }) {
   const [config, setConfig] = useState<Config>(DEFAULT)
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved]   = useState(false)
+  const [section, setSection] = useState<Section>('system')
 
   useEffect(() => { window.api.getConfig().then(setConfig) }, [])
 
@@ -100,164 +110,128 @@ export function Settings() {
   }
 
   return (
-    <div className="settings-page">
-      <div className="page-title">Settings</div>
-
-      {/* System */}
-      <div className="settings-group">
-        <div className="settings-group-title">System</div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Launch on startup</div>
-            <div className="settings-hint">Start with Windows</div>
-          </div>
-          <Toggle checked={config.autostart} onChange={v => upd('autostart', v)} />
-        </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Toast notifications</div>
-            <div className="settings-hint">Show notification when track changes</div>
-          </div>
-          <Toggle checked={config.toastNotifications} onChange={v => upd('toastNotifications', v)} />
-        </div>
-      </div>
-
-      {/* Discord */}
-      <div className="settings-group">
-        <div className="settings-group-title">Discord</div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Application ID</div>
-            <div className="settings-hint">Discord Developer Portal App ID</div>
-          </div>
-          <input className="settings-input" value={config.discordClientId}
-            onChange={e => upd('discordClientId', e.target.value)} placeholder="Client ID" />
-        </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Button 1</div>
-            <div className="settings-hint">Label and URL (default: Listen)</div>
-          </div>
-          <div className="settings-input-pair">
-            <input className="settings-input" style={{ width: 100 }} value={config.customButton1Label}
-              onChange={e => upd('customButton1Label', e.target.value)} placeholder="Label" />
-            <input className="settings-input" value={config.customButton1Url}
-              onChange={e => upd('customButton1Url', e.target.value)} placeholder="URL (empty = track link)" />
-          </div>
-        </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Button 2</div>
-            <div className="settings-hint">Label and URL</div>
-          </div>
-          <div className="settings-input-pair">
-            <input className="settings-input" style={{ width: 100 }} value={config.customButton2Label}
-              onChange={e => upd('customButton2Label', e.target.value)} placeholder="Label" />
-            <input className="settings-input" value={config.customButton2Url}
-              onChange={e => upd('customButton2Url', e.target.value)} placeholder="URL" />
-          </div>
-        </div>
-      </div>
-
-      {/* Privacy */}
-      <div className="settings-group">
-        <div className="settings-group-title">Privacy</div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Private mode</div>
-            <div className="settings-hint">Hide cover art from Discord</div>
-          </div>
-          <Toggle checked={config.privateMode} onChange={v => upd('privateMode', v)} />
-        </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Hide track name</div>
-            <div className="settings-hint">Show •••••• instead of track name</div>
-          </div>
-          <Toggle checked={config.hideTrackName} onChange={v => upd('hideTrackName', v)} />
-        </div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Hide artist name</div>
-            <div className="settings-hint">Show •••••• instead of artist name</div>
-          </div>
-          <Toggle checked={config.hideArtistName} onChange={v => upd('hideArtistName', v)} />
-        </div>
-      </div>
-
-      {/* Blacklist */}
-      <div className="settings-group">
-        <div className="settings-group-title">Blacklist</div>
-        <div className="settings-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 14 }}>
-          <BlacklistSection
-            title="Artists" items={config.blacklistArtists}
-            onAdd={addArtist} onRemove={removeArtist}
-            placeholder="Artist name…"
-          />
-          <BlacklistSection
-            title="Tracks" items={config.blacklistTracks}
-            onAdd={addTrack} onRemove={removeTrack}
-            placeholder="Track name…"
-          />
-        </div>
-      </div>
-
-      {/* Telegram */}
-      <div className="settings-group">
-        <div className="settings-group-title">Telegram Notifications</div>
-        <div className="settings-row">
-          <div>
-            <div className="settings-label">Enable</div>
-            <div className="settings-hint">Send now-playing to Telegram bot</div>
-          </div>
-          <Toggle checked={config.analyticsEnabled} onChange={v => upd('analyticsEnabled', v)} />
-        </div>
-        {config.analyticsEnabled && (<>
-          <div className="settings-row">
-            <div>
-              <div className="settings-label">Bot Token</div>
-              <div className="settings-hint">From @BotFather</div>
-            </div>
-            <input className="settings-input" type="password" value={config.botToken}
-              onChange={e => upd('botToken', e.target.value)} placeholder="123456:ABC-DEF…" />
-          </div>
-          <div className="settings-row">
-            <div>
-              <div className="settings-label">Chat ID</div>
-              <div className="settings-hint">Your Telegram user or chat ID</div>
-            </div>
-            <input className="settings-input" value={config.chatId}
-              onChange={e => upd('chatId', e.target.value)} placeholder="-100123456789" />
-          </div>
-        </>)}
-      </div>
-
-      <div className="save-row">
-        <button className="btn-save" onClick={save}>
-          {saved
-            ? <><IconCheck size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />Saved</>
-            : 'Save changes'}
-        </button>
-        {saved && <span className="save-ok">Settings applied</span>}
-      </div>
-
-      {/* About */}
-      <div className="settings-group" style={{ marginTop: 20 }}>
-        <div className="settings-group-title">About</div>
-        <div className="settings-row">
-          <div className="settings-label">Repository</div>
-          <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/M3th4d0n/YtMusic-RPC')}>
-            GitHub <IconExternalLink size={12} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
+    <div className="settings-layout">
+      {/* Left nav */}
+      <nav className="settings-nav">
+        {SECTIONS.map(s => (
+          <button key={s.id}
+            className={`settings-nav-item ${section === s.id ? 'active' : ''}`}
+            onClick={() => setSection(s.id)}>
+            {s.label}
           </button>
-        </div>
-        <div className="settings-row">
-          <div className="settings-label">Authors</div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/M3th4d0n')}>m3th4d0n</button>
-            <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/Anfi1')}>Anfi1</button>
-          </div>
-        </div>
+        ))}
+      </nav>
+
+      {/* Right panel */}
+      <div className="settings-panel">
+        {section === 'system' && (
+          <>
+            <div className="settings-panel-title">System</div>
+            <div className="settings-group">
+              <Row label="Launch on startup" hint="Start with Windows">
+                <Toggle checked={config.autostart} onChange={v => upd('autostart', v)} />
+              </Row>
+              <Row label="Toast notifications" hint="Show notification when track changes">
+                <Toggle checked={config.toastNotifications} onChange={v => upd('toastNotifications', v)} />
+              </Row>
+              <Row label="Theme" hint="Light or dark interface">
+                <div className="theme-switch">
+                  <button
+                    className={`theme-btn ${config.theme !== 'light' ? 'active' : ''}`}
+                    onClick={() => { upd('theme', 'dark'); onThemeChange?.('dark') }}>
+                    Dark
+                  </button>
+                  <button
+                    className={`theme-btn ${config.theme === 'light' ? 'active' : ''}`}
+                    onClick={() => { upd('theme', 'light'); onThemeChange?.('light') }}>
+                    Light
+                  </button>
+                </div>
+              </Row>
+            </div>
+            <SaveRow saved={saved} onSave={save} />
+          </>
+        )}
+
+        {section === 'discord' && (
+          <>
+            <div className="settings-panel-title">Discord</div>
+            <div className="settings-group">
+              <Row label="Application ID" hint="Discord Developer Portal App ID">
+                <input className="settings-input" value={config.discordClientId}
+                  onChange={e => upd('discordClientId', e.target.value)} placeholder="Client ID" />
+              </Row>
+            </div>
+            <SaveRow saved={saved} onSave={save} />
+          </>
+        )}
+
+        {section === 'blacklist' && (
+          <>
+            <div className="settings-panel-title">Blacklist</div>
+            <div className="settings-group" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <BlacklistSection title="Artists" items={config.blacklistArtists}
+                onAdd={addArtist} onRemove={removeArtist} placeholder="Artist name…" />
+              <BlacklistSection title="Tracks" items={config.blacklistTracks}
+                onAdd={addTrack} onRemove={removeTrack} placeholder="Track name…" />
+            </div>
+          </>
+        )}
+
+        {section === 'telegram' && (
+          <>
+            <div className="settings-panel-title">Telegram Notifications</div>
+            <div className="settings-group">
+              <Row label="Enable" hint="Send now-playing to Telegram bot">
+                <Toggle checked={config.analyticsEnabled} onChange={v => upd('analyticsEnabled', v)} />
+              </Row>
+              {config.analyticsEnabled && (<>
+                <Row label="Bot Token" hint="From @BotFather">
+                  <input className="settings-input" type="password" value={config.botToken}
+                    onChange={e => upd('botToken', e.target.value)} placeholder="123456:ABC-DEF…" />
+                </Row>
+                <Row label="Chat ID" hint="Your Telegram user or chat ID">
+                  <input className="settings-input" value={config.chatId}
+                    onChange={e => upd('chatId', e.target.value)} placeholder="-100123456789" />
+                </Row>
+              </>)}
+            </div>
+            <SaveRow saved={saved} onSave={save} />
+          </>
+        )}
+
+        {section === 'about' && (
+          <>
+            <div className="settings-panel-title">About</div>
+            <div className="settings-group">
+              <Row label="Repository">
+                <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/lonestill/YtMusic-RPC')}>
+                  GitHub <IconExternalLink size={12} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
+                </button>
+              </Row>
+              <Row label="Authors">
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/lonestill')}>lonestill</button>
+                  <button className="btn-ghost" onClick={() => window.api.openExternal('https://github.com/Anfi1')}>Anfi1</button>
+                </div>
+              </Row>
+            </div>
+          </>
+        )}
       </div>
+    </div>
+  )
+}
+
+function SaveRow({ saved, onSave }: { saved: boolean; onSave: () => void }) {
+  return (
+    <div className="save-row">
+      <button className="btn-save" onClick={onSave}>
+        {saved
+          ? <><IconCheck size={14} style={{ marginRight: 5, verticalAlign: 'middle' }} />Saved</>
+          : 'Save changes'}
+      </button>
+      {saved && <span className="save-ok">Settings applied</span>}
     </div>
   )
 }

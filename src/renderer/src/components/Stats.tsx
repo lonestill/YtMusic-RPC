@@ -3,17 +3,20 @@ import { type HistoryStats } from '../types'
 import { IconMusic } from './Icons'
 
 export function Stats() {
-  const [stats, setStats] = useState<HistoryStats | null>(null)
+  const [stats, setStats]   = useState<HistoryStats | null>(null)
+  const [confirm, setConfirm] = useState(false)
 
-  useEffect(() => {
-    window.api.getStats().then(setStats)
-  }, [])
+  function load() { window.api.getStats().then(setStats) }
 
-  useEffect(() => {
-    return window.api.onTrackUpdate(() => {
-      window.api.getStats().then(setStats)
-    })
-  }, [])
+  useEffect(() => { load() }, [])
+  useEffect(() => window.api.onTrackUpdate(load), [])
+
+  async function handleClear() {
+    if (!confirm) { setConfirm(true); setTimeout(() => setConfirm(false), 3000); return }
+    await window.api.clearHistory()
+    setConfirm(false)
+    load()
+  }
 
   if (!stats) return null
 
@@ -22,7 +25,14 @@ export function Stats() {
 
   return (
     <div className="stats-page">
-      <div className="page-title">Statistics</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div className="page-title" style={{ marginBottom: 0 }}>Statistics</div>
+        {stats.total > 0 && (
+          <button className={`btn-ghost btn-danger ${confirm ? 'active' : ''}`} onClick={handleClear}>
+            {confirm ? 'Sure?' : 'Clear all'}
+          </button>
+        )}
+      </div>
 
       {/* Counters */}
       <div className="stats-counters">

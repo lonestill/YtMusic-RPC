@@ -25,12 +25,16 @@ const api = {
   // history
   getHistory: (limit?: number): Promise<HistoryEntry[]> => ipcRenderer.invoke('history:get', limit),
   getStats: (): Promise<HistoryStats> => ipcRenderer.invoke('history:stats'),
+  clearHistory: (): Promise<void> => ipcRenderer.invoke('history:clear'),
 
   // blacklist
   addBlacklistArtist: (artist: string): Promise<void> => ipcRenderer.invoke('blacklist:add-artist', artist),
   removeBlacklistArtist: (artist: string): Promise<void> => ipcRenderer.invoke('blacklist:remove-artist', artist),
   addBlacklistTrack: (track: string): Promise<void> => ipcRenderer.invoke('blacklist:add-track', track),
   removeBlacklistTrack: (track: string): Promise<void> => ipcRenderer.invoke('blacklist:remove-track', track),
+
+  // discord
+  reconnectDiscord: (): Promise<boolean> => ipcRenderer.invoke('discord:reconnect'),
 
   // window
   getStatus: (): Promise<AppStatus> => ipcRenderer.invoke('status:get'),

@@ -22,10 +22,10 @@ export class DiscordService {
     }
   }
 
-  async reconnect(): Promise<void> {
+  async reconnect(): Promise<boolean> {
     this.destroy()
     this.client = new Client({ transport: 'ipc' })
-    await this.connect()
+    return this.connect()
   }
 
   get connected() { return this._connected }
@@ -35,19 +35,10 @@ export class DiscordService {
     if (!this._connected) return
 
     const cfg = store.store
-
-    if (!info.isPlaying) {
-      this.client.clearActivity()
-      return
-    }
-
-    const track  = cfg.hideTrackName  ? '••••••' : info.track.slice(0, 128)
-    const artist = cfg.hideArtistName ? '••••••' : info.artist.slice(0, 128)
-
-    const startTimestamp = new Date(Date.now() - info.currentTime * 1000)
+    const track  = info.track.slice(0, 128)
+    const artist = info.artist.slice(0, 128) || '—'
 
     const buttons: { label: string; url: string }[] = []
-
     const btn1Label = cfg.customButton1Label?.trim()
     const btn1Url   = cfg.customButton1Url?.trim() || `https://music.youtube.com/watch?v=${info.videoId}`
     if (btn1Label) buttons.push({ label: btn1Label.slice(0, 32), url: btn1Url })
@@ -56,14 +47,22 @@ export class DiscordService {
     const btn2Url   = cfg.customButton2Url?.trim()
     if (btn2Label && btn2Url) buttons.push({ label: btn2Label.slice(0, 32), url: btn2Url })
 
-    this.client.setActivity({
-      details: track,
-      state: artist,
-      largeImageKey: cfg.privateMode ? 'ytmusic' : info.cover,
-      largeImageText: track,
-      startTimestamp,
-      buttons: buttons.length ? buttons : undefined
-    })
+    try {
+      this.client.setActivity({
+        details: track,
+        state: artist,
+        largeImageKey: info.cover || undefined,
+        largeImageText: track,
+        startTimestamp: info.isPlaying
+          ? new Date(Date.now() - info.currentTime * 1000)
+          : undefined,
+        smallImageKey: info.isPlaying ? undefined : 'pause',
+        smallImageText: info.isPlaying ? undefined : 'Paused',
+        buttons: buttons.length ? buttons : undefined
+      })
+    } catch (e) {
+      console.error('[Discord] setActivity error:', e)
+    }
 
     this._lastVideoId = info.videoId
   }
@@ -74,7 +73,7 @@ export class DiscordService {
 
   destroy() {
     if (this._connected) {
-      this.client.destroy()
+      try { this.client.destroy() } catch {}
       this._connected = false
     }
   }

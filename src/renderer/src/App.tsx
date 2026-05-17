@@ -17,13 +17,15 @@ const TABS: { id: Tab; label: string; Icon: React.FC<{ size?: number }> }[] = [
 ]
 
 export default function App() {
-  const [tab, setTab]               = useState<Tab>('track')
-  const [track, setTrack]           = useState<TrackInfo | null>(null)
-  const [discord, setDiscord]       = useState(false)
-  const [websocket, setWebsocket]   = useState(false)
-  const [version, setVersion]       = useState('')
-  const [updateVersion, setUpdate]  = useState('')
-  const [updateReady, setReady]     = useState(false)
+  const [tab, setTab]             = useState<Tab>('track')
+  const [track, setTrack]         = useState<TrackInfo | null>(null)
+  const [discord, setDiscord]     = useState(false)
+  const [websocket, setWebsocket] = useState(false)
+  const [version, setVersion]     = useState('')
+  const [updateVersion, setUpdate] = useState('')
+  const [updateReady, setReady]   = useState(false)
+  const [reconnecting, setReconnecting] = useState(false)
+  const [theme, setTheme]         = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
     window.api.getStatus().then((s: AppStatus) => {
@@ -31,6 +33,12 @@ export default function App() {
       setWebsocket(s.websocket)
       setTrack(s.currentTrack)
       setVersion(s.version)
+    })
+
+    window.api.getConfig().then(cfg => {
+      const t = cfg.theme ?? 'dark'
+      setTheme(t)
+      document.body.className = `theme-${t}`
     })
 
     const offs = [
@@ -46,6 +54,19 @@ export default function App() {
     return () => offs.forEach(off => off())
   }, [])
 
+  async function handleReconnect() {
+    setReconnecting(true)
+    await window.api.reconnectDiscord()
+    setReconnecting(false)
+  }
+
+  function toggleTheme() {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    document.body.className = `theme-${next}`
+    window.api.setConfig({ theme: next })
+  }
+
   return (
     <div className="app">
       <div className="titlebar">
@@ -59,6 +80,9 @@ export default function App() {
           )}
         </div>
         <div className="titlebar-controls">
+          <button className="titlebar-btn" onClick={toggleTheme} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
           <button className="titlebar-btn" onClick={() => window.api.minimize()} title="Minimize">
             <IconMinus size={14} />
           </button>
@@ -86,11 +110,16 @@ export default function App() {
           <div className="sidebar-spacer" />
 
           <div className="sidebar-status">
-            <div className="status-item">
-              <span className={`led ${discord ? 'on' : 'off'}`} />
+            <button
+              className={`status-item status-item-btn ${discord ? '' : 'clickable'}`}
+              onClick={!discord && !reconnecting ? handleReconnect : undefined}
+              title={discord ? 'Discord connected' : 'Click to reconnect'}
+              disabled={reconnecting}
+            >
+              <span className={`led ${discord ? 'on' : reconnecting ? 'warn' : 'off'}`} />
               <IconDiscord size={13} style={{ opacity: 0.5 }} />
-              Discord RPC
-            </div>
+              {reconnecting ? 'Connecting…' : 'Discord RPC'}
+            </button>
             <div className="status-item">
               <span className={`led ${websocket ? 'on' : 'warn'}`} />
               <IconPlug size={13} style={{ opacity: 0.5 }} />
@@ -108,7 +137,7 @@ export default function App() {
               </span>
               <button
                 className="btn-ghost"
-                onClick={() => window.api.openExternal('https://github.com/M3th4d0n/YtMusic-RPC/releases/latest')}
+                onClick={() => window.api.openExternal('https://github.com/lonestill/YtMusic-RPC/releases/latest')}
               >
                 Details ↗
               </button>
@@ -119,13 +148,17 @@ export default function App() {
             {tab === 'track'    && <CurrentTrack track={track} />}
             {tab === 'history'  && <History />}
             {tab === 'stats'    && <Stats />}
-            {tab === 'settings' && <Settings />}
+            {tab === 'settings' && <Settings onThemeChange={(t) => {
+              setTheme(t)
+              document.body.className = `theme-${t}`
+            }} />}
           </div>
 
           <div className="mini-player">
             {track ? (
               <>
-                <div className="mini-art">
+                <div className="mini-art" style={{ cursor: 'pointer' }}
+                  onClick={() => window.api.openExternal(`https://music.youtube.com/watch?v=${track.videoId}`)}>
                   {track.cover
                     ? <img src={track.cover} alt="" />
                     : <IconMusic size={20} style={{ opacity: 0.3 }} />}

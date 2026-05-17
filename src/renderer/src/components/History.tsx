@@ -3,9 +3,10 @@ import { type HistoryEntry } from '../types'
 import { IconMusic, IconExternalLink, IconMusicPlaceholder } from './Icons'
 
 export function History() {
-  const [entries, setEntries]   = useState<HistoryEntry[]>([])
-  const [loading, setLoading]   = useState(true)
-  const [query, setQuery]       = useState('')
+  const [entries, setEntries] = useState<HistoryEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [query, setQuery]     = useState('')
+  const [confirm, setConfirm] = useState(false)
 
   useEffect(() => {
     window.api.getHistory().then((data) => { setEntries(data); setLoading(false) })
@@ -16,6 +17,13 @@ export function History() {
       window.api.getHistory().then(setEntries)
     })
   }, [])
+
+  async function handleClear() {
+    if (!confirm) { setConfirm(true); setTimeout(() => setConfirm(false), 3000); return }
+    await window.api.clearHistory()
+    setEntries([])
+    setConfirm(false)
+  }
 
   const filtered = useMemo(() => {
     if (!query.trim()) return entries
@@ -29,12 +37,19 @@ export function History() {
     <div className="history-page">
       <div className="history-header">
         <div className="page-title">History</div>
-        <input
-          className="search-input"
-          placeholder="Search tracks or artists…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            className="search-input"
+            placeholder="Search…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          {entries.length > 0 && (
+            <button className={`btn-ghost btn-danger ${confirm ? 'active' : ''}`} onClick={handleClear}>
+              {confirm ? 'Sure?' : 'Clear'}
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (

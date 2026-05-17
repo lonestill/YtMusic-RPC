@@ -22,6 +22,43 @@
   --player-h:     80px;
 }
 
+/* ── LIGHT THEME ────────────────────────────────────────────────── */
+body.theme-light {
+  --bg:           #f0f0f5;
+  --sidebar-bg:   rgba(235,235,242,0.97);
+  --card:         rgba(0,0,0,0.05);
+  --card-hover:   rgba(0,0,0,0.09);
+  --border:       rgba(0,0,0,0.09);
+  --text:         #111111;
+  --text-2:       rgba(0,0,0,0.55);
+  --text-3:       rgba(0,0,0,0.35);
+}
+
+body.theme-light .titlebar {
+  background: rgba(225,225,232,0.85);
+}
+
+body.theme-light .mini-player {
+  background: rgba(220,220,228,0.95);
+}
+
+body.theme-light .now-playing-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(240,240,245,0.65) 0%,
+    rgba(240,240,245,0.40) 40%,
+    rgba(240,240,245,0.85) 100%
+  );
+}
+
+body.theme-light .settings-input {
+  background: rgba(255,255,255,0.7);
+}
+
+body.theme-light .btn-ghost {
+  background: rgba(255,255,255,0.6);
+}
+
 html, body, #root {
   height: 100%;
   overflow: hidden;
@@ -173,6 +210,16 @@ input  { font: inherit; color: inherit; }
   font-size: 11px;
   color: var(--text-3);
 }
+
+.status-item-btn {
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius-sm);
+  padding: 2px 0;
+  transition: color 0.12s;
+}
+.status-item-btn.clickable:hover { color: var(--accent); cursor: pointer; }
+.status-item-btn:disabled { cursor: default; }
 
 .led {
   width: 6px;
@@ -462,6 +509,48 @@ input  { font: inherit; color: inherit; }
 .empty-state p { font-size: 13px; }
 
 /* ── SETTINGS ────────────────────────────────────────────────────── */
+.settings-layout {
+  display: flex;
+  height: 100%;
+}
+
+.settings-nav {
+  width: 140px;
+  flex-shrink: 0;
+  padding: 20px 8px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-nav-item {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-align: left;
+  transition: background 0.12s, color 0.12s;
+  width: 100%;
+}
+.settings-nav-item:hover  { background: var(--card); color: var(--text); }
+.settings-nav-item.active { background: rgba(252,60,68,0.15); color: var(--accent); }
+
+.settings-panel {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.settings-panel-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+
 .settings-page { padding: 24px; max-width: 560px; }
 
 .settings-group {
@@ -556,6 +645,27 @@ input  { font: inherit; color: inherit; }
 }
 .btn-ghost:hover { background: var(--card); color: var(--text); }
 
+.btn-ghost.btn-danger        { color: var(--text-3); }
+.btn-ghost.btn-danger:hover  { color: #ff453a; border-color: rgba(255,69,58,0.4); background: rgba(255,69,58,0.08); }
+.btn-ghost.btn-danger.active { color: #ff453a; border-color: rgba(255,69,58,0.6); background: rgba(255,69,58,0.15); }
+
+.theme-switch {
+  display: flex;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.theme-btn {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: background 0.15s, color 0.15s;
+}
+.theme-btn.active { background: var(--accent); color: #fff; }
+.theme-btn:not(.active):hover { background: var(--card-hover); color: var(--text); }
+
 .save-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
 
 .save-ok {
@@ -617,6 +727,8 @@ input  { font: inherit; color: inherit; }
   gap: 8px;
   align-items: center;
 }
+
+.blacklist-section { display: flex; flex-direction: column; gap: 8px; }
 
 .blacklist-label {
   font-size: 12px;
