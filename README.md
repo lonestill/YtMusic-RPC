@@ -71,7 +71,7 @@ npm run dev
 
 ## Авторы
 
-- [m3th4d0n](https://github.com/lonestill)
+- [lonestill](https://github.com/lonestill)
 - [Anfi1](https://github.com/Anfi1)
 
 ## Лицензия
