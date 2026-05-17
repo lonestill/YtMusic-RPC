@@ -71,6 +71,10 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => mainWindow?.show())
 
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
+  }
+
   mainWindow.on('close', (e) => {
     if (!quitting) {
       e.preventDefault()
@@ -109,6 +113,10 @@ function setupIPC() {
     // reconnect discord if client ID changed
     if (updates['discordClientId']) {
       discord.reconnect()
+    }
+    // re-apply presence immediately so privacy/button changes take effect
+    if (currentTrack) {
+      discord.updatePresence(currentTrack)
     }
   })
 

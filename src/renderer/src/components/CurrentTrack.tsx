@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { type TrackInfo } from '../types'
 import { IconMusicPlaceholder, IconExternalLink, IconPlay, IconPause } from './Icons'
+import { getDominantColor } from '../utils/dominantColor'
 
 function fmt(sec: number): string {
   const m = Math.floor(sec / 60)
@@ -8,6 +10,19 @@ function fmt(sec: number): string {
 }
 
 export function CurrentTrack({ track }: { track: TrackInfo | null }) {
+  const [accent, setAccent] = useState('var(--accent)')
+
+  useEffect(() => {
+    if (!track?.cover) { setAccent('var(--accent)'); return }
+    getDominantColor(track.cover).then(setAccent)
+  }, [track?.cover])
+
+  // apply accent CSS var globally
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent', accent)
+    return () => document.documentElement.style.removeProperty('--accent')
+  }, [accent])
+
   if (!track) {
     return (
       <div className="no-track">
@@ -25,15 +40,14 @@ export function CurrentTrack({ track }: { track: TrackInfo | null }) {
   return (
     <div className="now-playing">
       {track.cover && (
-        <div
-          className="now-playing-bg"
-          style={{ backgroundImage: `url(${track.cover})` }}
-        />
+        <div className="now-playing-bg" style={{ backgroundImage: `url(${track.cover})` }} />
       )}
       <div className="now-playing-overlay" />
 
       <div className="now-playing-inner">
-        <div className="art-wrap">
+        {/* Album art with pulse when playing */}
+        <div className={`art-wrap ${track.isPlaying ? 'art-playing' : ''}`}
+          style={{ '--art-accent': accent } as React.CSSProperties}>
           {track.cover
             ? <img src={track.cover} alt="cover" />
             : <IconMusicPlaceholder size={72} />
@@ -48,14 +62,13 @@ export function CurrentTrack({ track }: { track: TrackInfo | null }) {
         <span className={`now-badge ${track.isPlaying ? 'playing' : 'paused'}`}>
           {track.isPlaying
             ? <><IconPlay size={11} /> Playing</>
-            : <><IconPause size={11} /> Paused</>
-          }
+            : <><IconPause size={11} /> Paused</>}
         </span>
 
         {track.totalDuration > 0 && (
           <div className="progress-wrap">
             <div className="progress-track">
-              <div className="progress-fill" style={{ width: `${pct}%` }} />
+              <div className="progress-fill" style={{ width: `${pct}%`, background: accent }} />
             </div>
             <div className="progress-times">
               <span>{fmt(track.currentTime)}</span>

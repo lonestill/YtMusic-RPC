@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { CurrentTrack } from './components/CurrentTrack'
 import { History } from './components/History'
 import { Settings } from './components/Settings'
+import { Stats } from './components/Stats'
 import {
-  IconMusic, IconClock, IconSettings,
+  IconMusic, IconClock, IconSettings, IconBarChart,
   IconMinus, IconX, IconDiscord, IconPlug
 } from './components/Icons'
 import { type Tab, type TrackInfo, type AppStatus } from './types'
@@ -11,16 +12,18 @@ import { type Tab, type TrackInfo, type AppStatus } from './types'
 const TABS: { id: Tab; label: string; Icon: React.FC<{ size?: number }> }[] = [
   { id: 'track',    label: 'Now Playing', Icon: IconMusic },
   { id: 'history',  label: 'History',     Icon: IconClock },
+  { id: 'stats',    label: 'Statistics',  Icon: IconBarChart },
   { id: 'settings', label: 'Settings',    Icon: IconSettings }
 ]
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('track')
-  const [track, setTrack] = useState<TrackInfo | null>(null)
-  const [discord, setDiscord] = useState(false)
-  const [websocket, setWebsocket] = useState(false)
-  const [version, setVersion] = useState('')
-  const [updateVersion, setUpdateVersion] = useState('')
+  const [tab, setTab]               = useState<Tab>('track')
+  const [track, setTrack]           = useState<TrackInfo | null>(null)
+  const [discord, setDiscord]       = useState(false)
+  const [websocket, setWebsocket]   = useState(false)
+  const [version, setVersion]       = useState('')
+  const [updateVersion, setUpdate]  = useState('')
+  const [updateReady, setReady]     = useState(false)
 
   useEffect(() => {
     window.api.getStatus().then((s: AppStatus) => {
@@ -30,14 +33,17 @@ export default function App() {
       setVersion(s.version)
     })
 
-    const offTrack  = window.api.onTrackUpdate(setTrack)
-    const offStatus = window.api.onStatusUpdate((s) => {
-      if (s.discord   !== undefined) setDiscord(s.discord)
-      if (s.websocket !== undefined) setWebsocket(s.websocket)
-    })
-    const offUpdate = window.api.onUpdateAvailable(setUpdateVersion)
+    const offs = [
+      window.api.onTrackUpdate(setTrack),
+      window.api.onStatusUpdate((s) => {
+        if (s.discord   !== undefined) setDiscord(s.discord)
+        if (s.websocket !== undefined) setWebsocket(s.websocket)
+      }),
+      window.api.onUpdateDownloading((v) => { setUpdate(v); setReady(false) }),
+      window.api.onUpdateReady((v)       => { setUpdate(v); setReady(true) })
+    ]
 
-    return () => { offTrack(); offStatus(); offUpdate() }
+    return () => offs.forEach(off => off())
   }, [])
 
   return (
@@ -82,12 +88,12 @@ export default function App() {
           <div className="sidebar-status">
             <div className="status-item">
               <span className={`led ${discord ? 'on' : 'off'}`} />
-              <IconDiscord size={13} style={{ opacity: 0.6 }} />
+              <IconDiscord size={13} style={{ opacity: 0.5 }} />
               Discord RPC
             </div>
             <div className="status-item">
               <span className={`led ${websocket ? 'on' : 'warn'}`} />
-              <IconPlug size={13} style={{ opacity: 0.6 }} />
+              <IconPlug size={13} style={{ opacity: 0.5 }} />
               Extension
             </div>
           </div>
@@ -96,12 +102,15 @@ export default function App() {
         <div className="content-wrap">
           {updateVersion && (
             <div className="update-banner">
-              <span>Update available — v{updateVersion}</span>
+              <span>
+                {updateReady ? '✓ Update ready — ' : '↓ Downloading update — '}
+                v{updateVersion}
+              </span>
               <button
                 className="btn-ghost"
                 onClick={() => window.api.openExternal('https://github.com/M3th4d0n/YtMusic-RPC/releases/latest')}
               >
-                Download ↗
+                Details ↗
               </button>
             </div>
           )}
@@ -109,6 +118,7 @@ export default function App() {
           <div className="content">
             {tab === 'track'    && <CurrentTrack track={track} />}
             {tab === 'history'  && <History />}
+            {tab === 'stats'    && <Stats />}
             {tab === 'settings' && <Settings />}
           </div>
 
@@ -118,8 +128,7 @@ export default function App() {
                 <div className="mini-art">
                   {track.cover
                     ? <img src={track.cover} alt="" />
-                    : <IconMusic size={20} style={{ opacity: 0.3 }} />
-                  }
+                    : <IconMusic size={20} style={{ opacity: 0.3 }} />}
                 </div>
                 <div className="mini-meta">
                   <div className="mini-track">{track.track}</div>

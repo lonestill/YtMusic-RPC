@@ -10,17 +10,37 @@ export interface TrackInfo {
 
 export interface HistoryEntry {
   time: string
+  timestamp: number
   artist: string
   track: string
   url: string
   cover: string
 }
 
-export interface AppConfig {
+export interface HistoryStats {
+  total: number
+  today: number
+  thisWeek: number
+  topArtists: { name: string; count: number }[]
+  topTracks: { name: string; artist: string; count: number; cover: string }[]
+}
+
+export interface Config {
+  discordClientId: string
+  customButton1Label: string
+  customButton1Url: string
+  customButton2Label: string
+  customButton2Url: string
+  privateMode: boolean
+  hideTrackName: boolean
+  hideArtistName: boolean
+  toastNotifications: boolean
+  blacklistArtists: string[]
+  blacklistTracks: string[]
   analyticsEnabled: boolean
   botToken: string
   chatId: string
-  discordClientId: string
+  autostart: boolean
 }
 
 export interface AppStatus {
@@ -30,4 +50,9 @@ export interface AppStatus {
   version: string
 }
 
-export type Tab = 'track' | 'history' | 'settings'
+export interface StatusUpdate {
+  discord?: boolean
+  websocket?: boolean
+}
+
+export type Tab = 'track' | 'history' | 'stats' | 'settings'
