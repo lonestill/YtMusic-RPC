@@ -8,49 +8,49 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/lonestill/YtMusic-RPC/release.yml?style=flat-square)](https://github.com/lonestill/YtMusic-RPC/actions)
 [![License](https://img.shields.io/github/license/lonestill/YtMusic-RPC?style=flat-square)](LICENSE)
 
-Показывает текущий трек из YouTube Music в статусе Discord — с обложкой, прогресс-баром и прямой ссылкой на трек.
+Shows your current YouTube Music track in Discord status — with cover art, progress bar, and a direct link to the track.
 
 </div>
 
 ---
 
-## Возможности
+## Features
 
-- **Discord Rich Presence** — обложка, название, артист, таймер
-- **GUI приложение** — нативное окно, сворачивается в трей, светлая и тёмная тема
-- **История треков** — все прослушанные треки с поиском и очисткой
-- **Статистика** — топ артисты и треки за всё время, сегодня, за неделю
-- **Blacklist** — треки и артисты которые не будут показываться в RPC
-- **Telegram уведомления** — отправка текущего трека в бота
-- **Автозапуск** при старте Windows
-- **Автообновление** — скачивает и устанавливает новые версии само
-- **Reconnect** — переподключение к Discord без перезапуска приложения
+- **Discord Rich Presence** — cover art, track name, artist, live timer
+- **GUI app** — native window, minimizes to tray, light & dark theme
+- **Listening history** — full playback history with search and clear
+- **Statistics** — top artists and tracks, today / this week / all time
+- **Blacklist** — artists and tracks that won't appear in your Discord status
+- **Telegram notifications** — sends now-playing info to your Telegram bot
+- **Auto-start** on Windows login
+- **Auto-update** — downloads and installs new versions automatically
+- **Reconnect** — reconnect to Discord without restarting the app
 
-## Установка
+## Installation
 
-### 1. Скачать приложение
+### 1. Download the app
 
-→ [Последний релиз](https://github.com/lonestill/YtMusic-RPC/releases/latest)
+→ [Latest release](https://github.com/lonestill/YtMusic-RPC/releases/latest)
 
-Скачай `.exe` установщик и запусти.
+Download the `.exe` installer and run it.
 
-### 2. Установить расширение для браузера
+### 2. Install the browser extension
 
-Расширение отправляет данные трека из YouTube Music в приложение через WebSocket.
+The extension sends track data from YouTube Music to the app over WebSocket.
 
-→ [YouTube Music WebSocket Tracker на Greasy Fork](https://greasyfork.org/ru/scripts/578650-youtube-music-websocket-tracker)
+→ [YouTube Music WebSocket Tracker on Greasy Fork](https://greasyfork.org/ru/scripts/578650-youtube-music-websocket-tracker)
 
-Нужен менеджер пользовательских скриптов: [Tampermonkey](https://www.tampermonkey.net/) (Chrome/Firefox/Edge).
+You need a userscript manager: [Tampermonkey](https://www.tampermonkey.net/) (Chrome / Firefox / Edge).
 
-## Использование
+## Usage
 
-1. Запусти **YtMusic-RPC** — появится в трее
-2. Убедись что расширение активно (зелёный индикатор **Extension** в приложении)
-3. Убедись что Discord подключён (зелёный индикатор **Discord RPC**)
-4. Открой [YouTube Music](https://music.youtube.com/) и запусти трек
-5. Статус в Discord обновится автоматически
+1. Launch **YtMusic-RPC** — it appears in the system tray
+2. Make sure the extension is active — green **Extension** indicator in the sidebar
+3. Make sure Discord is connected — green **Discord RPC** indicator in the sidebar
+4. Open [YouTube Music](https://music.youtube.com/) and play a track
+5. Your Discord status updates automatically
 
-## Разработка
+## Development
 
 ```bash
 git clone https://github.com/lonestill/YtMusic-RPC
@@ -59,22 +59,22 @@ npm install
 npm run dev
 ```
 
-**Стек:** Electron · React · TypeScript · discord-rpc · electron-updater · ws
+**Stack:** Electron · React · TypeScript · discord-rpc · electron-updater · ws
 
-## Устранение неполадок
+## Troubleshooting
 
-| Проблема | Решение |
+| Problem | Solution |
 |---|---|
-| Discord не обновляется | Кликни на индикатор **Discord RPC** в сайдбаре для переподключения |
-| Расширение не подключается | Проверь что WebSocket порт `5000` не заблокирован антивирусом |
-| Трек не отображается | Убедись что артист/трек не в blacklist |
-| Приложение не запускается | Попробуй запустить от имени администратора |
+| Discord status not updating | Click the **Discord RPC** indicator in the sidebar to reconnect |
+| Extension not connecting | Make sure WebSocket port `5000` is not blocked by your antivirus |
+| Track not showing | Check that the artist / track is not in your blacklist |
+| App won't start | Try running as administrator |
 
-## Авторы
+## Authors
 
 - [lonestill](https://github.com/lonestill)
 - [Anfi1](https://github.com/Anfi1)
 
-## Лицензия
+## License
 
 [MIT](LICENSE)
