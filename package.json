@@ -1,6 +1,6 @@
 {
   "name": "ytmusic-rpc",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "YouTube Music Discord Rich Presence",
   "main": "out/main/index.js",
   "author": "lonestill & Anfi1",
