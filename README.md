@@ -31,7 +31,7 @@
 
 ### 1. Скачать приложение
 
-→ [Последний релиз](https://github.com/M3th4d0n/YtMusic-RPC/releases/latest)
+→ [Последний релиз](https://github.com/lonestill/YtMusic-RPC/releases/latest)
 
 Скачай `.exe` установщик и запусти.
 
@@ -71,7 +71,7 @@ npm run dev
 
 ## Авторы
 
-- [m3th4d0n](https://github.com/M3th4d0n)
+- [m3th4d0n](https://github.com/lonestill)
 - [Anfi1](https://github.com/Anfi1)
 
 ## Лицензия
